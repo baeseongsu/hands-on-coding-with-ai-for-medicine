@@ -1,0 +1,22 @@
+.DS_Store
+
+**/.env
+**/.env.*
+!**/.env.example
+
+**/.venv/
+**/node_modules/
+**/dist/
+**/coverage/
+**/__pycache__/
+**/*.py[cod]
+
+**/public/generated/
+**/data/generated/
+
+# 로컬 설계·기획 노트. 실습 내용이 아니라 작업용 자료이므로 수강생용 저장소에
+# 포함하지 않습니다.
+docs/superpowers/
+
+# 에이전트 도구가 만드는 상태 파일. 포트, 토큰, PID, 로컬 경로가 들어 있습니다.
+**/.superpowers/

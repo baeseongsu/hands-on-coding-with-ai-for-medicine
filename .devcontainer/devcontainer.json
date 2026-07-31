@@ -1,0 +1,40 @@
+{
+  "name": "hands-on-coding-with-ai-for-medicine",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+  "features": {
+    "ghcr.io/devcontainers/features/python:1": {
+      "version": "3.12"
+    },
+    "ghcr.io/devcontainers/features/github-cli:1": {}
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "openai.chatgpt",
+        "ms-python.python",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "files.exclude": {
+          ".devcontainer": true,
+          "docs": true,
+          "AGENTS.md": true
+        },
+        "search.exclude": {
+          ".devcontainer": true,
+          "docs": true,
+          "AGENTS.md": true
+        }
+      }
+    }
+  },
+  "remoteEnv": {
+    "VIRTUAL_ENV": "/home/node/.virtualenvs/hands-on-medai",
+    "PATH": "/home/node/.virtualenvs/hands-on-medai/bin:${containerEnv:PATH}"
+  },
+  "onCreateCommand": "bash .devcontainer/on-create.sh",
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+  "postAttachCommand": "bash .devcontainer/post-attach.sh"
+}

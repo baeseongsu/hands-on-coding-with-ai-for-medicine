@@ -1,0 +1,12 @@
+# 체크아웃 시 줄바꿈을 정규화합니다. 이 설정이 없으면 Windows에서 clone할 때
+# .devcontainer/*.sh 에 CRLF가 들어가고, 그 스크립트는 Linux 컨테이너 안에서
+# "bad interpreter" 오류로 실패합니다.
+* text=auto eol=lf
+
+# 아래 파일들에는 텍스트 정규화를 적용하지 않습니다. MIMIC-IV Demo 아카이브는
+# SHA-256 검증이 완료 조건에 포함되므로, Git의 binary 자동 판별에 맡기지 않고
+# 명시적으로 표시해 바이트 단위로 보존합니다.
+*.zip binary
+*.pdf binary
+*.png binary
+*.jpg binary
