@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>EMR Viewer · MIMIC-IV Demo</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/timeline.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar">
+        <div class="brand">
+          <div class="brand-mark">+</div>
+          <div><strong>EMR Viewer</strong><span>MIMIC-IV Demo</span></div>
+        </div>
+
+        <nav class="side-nav" aria-label="Viewer sections">
+          <a class="nav-item active" href="#patient-search"><span class="nav-icon">⌕</span>Patient search</a>
+          <a class="nav-item" href="#patient-summary"><span class="nav-icon">◎</span>Patient summary</a>
+          <a class="nav-item" href="#admissions"><span class="nav-icon">▤</span>Admissions</a>
+          <a class="nav-item" href="#clinical-domains"><span class="nav-icon">◈</span>Clinical domains</a>
+          <a class="nav-item" href="#timeline"><span class="nav-icon">↕</span>Timeline</a>
+        </nav>
+
+        <div class="sidebar-note">
+          <span class="eyebrow">DATASET</span>
+          <strong>Clinical Database Demo</strong>
+          <p>비식별화된 공개 교육용 데이터셋입니다.</p>
+        </div>
+        <div class="sidebar-footer">Educational prototype<br />Not for clinical use</div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">PATIENT RECORD</p>
+            <h1>Patient lookup</h1>
+          </div>
+          <div class="status-pill"><span class="status-dot"></span>Local dataset</div>
+        </header>
+
+        <section class="search-panel" id="patient-search" aria-labelledby="search-title">
+          <div>
+            <p class="eyebrow">SEARCH BY SUBJECT ID</p>
+            <h2 id="search-title">Find a patient</h2>
+            <p class="section-copy">환자 ID를 입력하면 기본 정보와 입원 기록을 조회합니다.</p>
+          </div>
+          <form id="search-form" class="search-form">
+            <label for="subject-id">Subject ID</label>
+            <div class="search-row">
+              <input id="subject-id" name="subject-id" value="10000032" inputmode="numeric" autocomplete="off" aria-describedby="search-help" />
+              <button type="submit" id="search-button"><span>Search patient</span><span class="button-arrow">→</span></button>
+            </div>
+            <p id="search-help" class="field-help">예시: 10000032</p>
+          </form>
+        </section>
+
+        <div id="message" class="message" role="status" aria-live="polite"></div>
+
+        <div id="record-view" hidden>
+          <section class="section-block" id="patient-summary" aria-labelledby="patient-summary-title">
+            <div class="section-heading">
+              <div><p class="eyebrow">IDENTITY</p><h2 id="patient-summary-title">Patient summary</h2></div>
+              <span id="patient-id-badge" class="id-badge"></span>
+            </div>
+            <div class="patient-card">
+              <div class="patient-avatar" aria-hidden="true">♀</div>
+              <div class="patient-identity"><span class="eyebrow">DE-IDENTIFIED PATIENT</span><h3 id="patient-label"></h3><p id="patient-demographics"></p></div>
+              <div class="patient-facts">
+                <div><span class="fact-label">Gender</span><strong id="patient-gender"></strong></div>
+                <div><span class="fact-label">Anchor age</span><strong id="patient-age"></strong></div>
+                <div><span class="fact-label">Anchor year group</span><strong id="patient-year-group"></strong></div>
+                <div><span class="fact-label">Date of death</span><strong id="patient-dod"></strong></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="section-block" id="admissions" aria-labelledby="admissions-title">
+            <div class="section-heading">
+              <div><p class="eyebrow">ENCOUNTER HISTORY</p><h2 id="admissions-title">Admissions</h2></div>
+              <span id="admission-count" class="count-badge"></span>
+            </div>
+            <div class="table-card">
+              <div class="table-scroll">
+                <table>
+                  <thead><tr><th>Admission ID</th><th>Admitted</th><th>Discharged</th><th>Type</th><th>Admission location</th><th>Discharge location</th></tr></thead>
+                  <tbody id="admissions-body"></tbody>
+                </table>
+              </div>
+              <div id="no-admissions" class="empty-state" hidden>No admission records found for this patient.</div>
+            </div>
+          </section>
+
+          <section class="section-block domains-section" id="clinical-domains" aria-labelledby="domains-title">
+            <div class="section-heading">
+              <div><p class="eyebrow">CLINICAL DATA</p><h2 id="domains-title">Clinical domains</h2></div>
+              <span class="domain-note">Names resolved from MIMIC-IV dictionaries</span>
+            </div>
+            <div class="domain-cards" aria-label="Domain record counts">
+              <button class="domain-card active" type="button" data-domain-tab="diagnoses"><span class="domain-card-label">Diagnoses</span><strong id="diagnosis-count">—</strong><span>ICD-coded records</span></button>
+              <button class="domain-card" type="button" data-domain-tab="prescriptions"><span class="domain-card-label">Prescriptions</span><strong id="prescription-count">—</strong><span>Medication orders</span></button>
+              <button class="domain-card" type="button" data-domain-tab="labs"><span class="domain-card-label">Lab results</span><strong id="lab-count">—</strong><span>Reported results</span></button>
+            </div>
+            <div class="domain-toolbar">
+              <label for="domain-hadm-filter">Admission</label>
+              <select id="domain-hadm-filter"><option value="all">All admissions</option></select>
+              <label class="check-label"><input id="abnormal-only" type="checkbox" /> Abnormal labs only</label>
+              <span id="domain-result-count" class="result-count"></span>
+            </div>
+            <div class="domain-panel" data-domain-panel="diagnoses">
+              <div class="table-scroll domain-table-scroll"><table><thead><tr><th>Diagnosis</th><th>ICD code</th><th>Version</th><th>Admission ID</th></tr></thead><tbody id="diagnoses-body"></tbody></table></div>
+            </div>
+            <div class="domain-panel" data-domain-panel="prescriptions" hidden>
+              <div class="table-scroll domain-table-scroll"><table><thead><tr><th>Medication</th><th>Strength</th><th>Dose</th><th>Route</th><th>Start</th><th>Stop</th><th>Admission ID</th></tr></thead><tbody id="prescriptions-body"></tbody></table></div>
+            </div>
+            <div class="domain-panel" data-domain-panel="labs" hidden>
+              <div class="table-scroll domain-table-scroll"><table><thead><tr><th>Test</th><th>Result</th><th>Reference range</th><th>Flag</th><th>Charted</th><th>Admission ID</th></tr></thead><tbody id="labs-body"></tbody></table></div>
+            </div>
+          </section>
+
+          <section class="section-block timeline-section" id="timeline" aria-labelledby="timeline-title">
+            <div class="section-heading">
+              <div><p class="eyebrow">LONGITUDINAL VIEW</p><h2 id="timeline-title">Timeline</h2></div>
+              <div class="timeline-meta"><span id="timeline-count">— events</span><span id="timeline-range">—</span></div>
+            </div>
+            <div class="timeline-toolbar">
+              <div class="timeline-filters" role="group" aria-label="Timeline event type">
+                <button class="timeline-filter active" type="button" data-timeline-filter="all">All</button>
+                <button class="timeline-filter" type="button" data-timeline-filter="admission">Admissions</button>
+                <button class="timeline-filter" type="button" data-timeline-filter="diagnosis">Diagnoses</button>
+                <button class="timeline-filter" type="button" data-timeline-filter="prescription">Prescriptions</button>
+                <button class="timeline-filter" type="button" data-timeline-filter="lab">Labs</button>
+              </div>
+              <select id="timeline-hadm-filter" aria-label="Filter timeline by admission"><option value="all">All admissions</option></select>
+            </div>
+            <p class="timeline-note">진단은 해당 입원 시각을 기준으로 배치됩니다. 원본 데이터에 진단별 timestamp가 없기 때문입니다.</p>
+            <div id="timeline-list" class="timeline-list"></div>
+            <div id="timeline-empty" class="empty-state" hidden>No timeline events match the selected filters.</div>
+          </section>
+        </div>
+
+        <footer class="main-footer">MIMIC-IV Clinical Database Demo v2.2 · For education and research prototyping only</footer>
+      </main>
+    </div>
+  </body>
+</html>

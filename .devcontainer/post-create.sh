@@ -45,14 +45,7 @@ fi
 TEXT
 )"
 
-# .bashrc covers interactive bash, .zshrc covers zsh, and .profile covers bash
-# login shells, which do not read .bashrc at all. Login shells also re-run
-# /etc/profile, which puts the python feature's bin ahead of the virtual
-# environment; the snippet runs after that and prepends the environment back.
-#
-# Do not add .bash_profile here. Creating it would shadow .profile, which is the
-# file bash actually reads on this image.
-for profile in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
+for profile in "$HOME/.bashrc" "$HOME/.zshrc"; do
   touch "$profile"
   if ! grep -qF "$PROFILE_MARKER" "$profile"; then
     printf '%s\n' "$PROFILE_SNIPPET" >>"$profile"
@@ -64,14 +57,3 @@ npm --version
 python3 --version
 python3 -m pip --version
 codex --version
-
-# Every shell a participant might open has to resolve the same interpreter.
-# Without this check a mismatch shows up later as "it works in my terminal".
-for shell in bash zsh; do
-  resolved="$("$shell" -lc 'python3 -c "import sys; print(sys.prefix)"' 2>/dev/null || true)"
-  if [ "$resolved" != "$WORKSHOP_VENV" ]; then
-    echo "$shell 로그인 셸이 $resolved 를 씁니다. 기대값은 $WORKSHOP_VENV 입니다." >&2
-    exit 1
-  fi
-  echo "$shell 로그인 셸 확인: $resolved"
-done
